@@ -3,6 +3,7 @@ package cli
 import (
 	"errors"
 	"flag"
+	"fmt"
 	"strings"
 
 	p "github.com/mouhamedbourouba/tlgr/config"
@@ -14,10 +15,11 @@ var (
 
 	parsed bool = false
 
-	listFlag    *bool = flag.Bool("list", false, "List all commands in the cache")
-	updateFlag  *bool = flag.Bool("update", false, "Update the local cache")
-	helpFlag    *bool = flag.Bool("help", false, "Print help")
-	versionFlag *bool = flag.Bool("version", false, "Print the version")
+	listFlag       *bool = flag.Bool("list", false, "List all commands in the cache")
+	updateFlag     *bool = flag.Bool("update", false, "Update the local cache")
+	helpFlag       *bool = flag.Bool("help", false, "Print help")
+	clearCacheFlag *bool = flag.Bool("clear-cache", false, "Clears Local Cache")
+	versionFlag    *bool = flag.Bool("version", false, "Print the version")
 
 	platformString = flag.String(
 		"platform",
@@ -45,6 +47,10 @@ func Parse() error {
 }
 
 func PrintHelp() {
+	fmt.Print("TLGR A fast tldr client written in go\n")
+	fmt.Print("Auther: Mouhamed Redha bourouba <mouhamedmobiledev@gmail.com>\n\n")
+	fmt.Print("Usage: tlgr [COMMAND]... [OPTIONS]", "\n\n", "Arguments:\n  [COMMAND]...  The command to show (e.g. `git commit` or `awk`)", "\n\n")
+	fmt.Print("Options:\n")
 	flag.PrintDefaults()
 }
 
@@ -82,4 +88,9 @@ func GetHelpFlag() bool {
 func GetVersionFlag() bool {
 	assertParsed()
 	return *versionFlag
+}
+
+func GetClearCacheFlag() bool {
+	assertParsed()
+	return *clearCacheFlag
 }

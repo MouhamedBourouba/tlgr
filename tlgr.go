@@ -32,6 +32,12 @@ func main() {
 		os.Exit(0)
 	}
 	
+	if cli.GetClearCacheFlag() {
+		fmt.Printf("clearing cache ---\n")
+		clearLocalCache()
+		os.Exit(0)
+	}
+
 	if cli.GetCommandString() != "" {
 		fmt.Print("Printing tldr for", cli.GetCommandString())
 		printTldr(cli.GetCommandString())
@@ -39,6 +45,10 @@ func main() {
 	}
 
 	cli.PrintHelp()
+}
+
+func clearLocalCache() {
+	panic("unimplemented")
 }
 
 func printTldr(s string) {
