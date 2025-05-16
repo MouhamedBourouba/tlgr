@@ -24,9 +24,20 @@ var (
 	platformString = flag.String(
 		"platform",
 		p.GetDefaultPlatform().ToString(),
-		"Override the operating system, can be specified multiple times in order of preference [possible values: linux, macos, windows, android, freebsd, netbsd]",
+		"Override the operating system [possible values: linux, macos, windows, android, freebsd, netbsd]",
 	)
 )
+
+func init() {
+	flag.Usage = func() {
+		fmt.Print("TLGR A fast tldr client written in go\n")
+		fmt.Print("Auther: Mouhamed Redha bourouba <mouhamedmobiledev@gmail.com>\n\n")
+		fmt.Print("Usage: tlgr [OPTIONS] [COMMAND]...", "\n\n")
+		fmt.Print("Arguments:\n  [COMMAND]...  The command to show (e.g. `git commit` or `awk`)", "\n\n")
+		fmt.Print("Options:\n")
+		flag.PrintDefaults()
+	}
+}
 
 func Parse() error {
 	flag.Parse()
@@ -47,11 +58,7 @@ func Parse() error {
 }
 
 func PrintHelp() {
-	fmt.Print("TLGR A fast tldr client written in go\n")
-	fmt.Print("Auther: Mouhamed Redha bourouba <mouhamedmobiledev@gmail.com>\n\n")
-	fmt.Print("Usage: tlgr [COMMAND]... [OPTIONS]", "\n\n", "Arguments:\n  [COMMAND]...  The command to show (e.g. `git commit` or `awk`)", "\n\n")
-	fmt.Print("Options:\n")
-	flag.PrintDefaults()
+	flag.Usage()
 }
 
 func assertParsed() {

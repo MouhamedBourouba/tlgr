@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/mouhamedbourouba/tlgr/cli"
 )
@@ -13,6 +14,11 @@ func main() {
 	if cli.GetHelpFlag() {
 		cli.PrintHelp()
 		os.Exit(0)
+	}
+
+	if cli.GetClearCacheFlag() {
+		fmt.Printf("clearing cache ---\n")
+		clearLocalCache()
 	}
 
 	if cli.GetVersionFlag() {
@@ -31,15 +37,8 @@ func main() {
 		listAllCommands()
 		os.Exit(0)
 	}
-	
-	if cli.GetClearCacheFlag() {
-		fmt.Printf("clearing cache ---\n")
-		clearLocalCache()
-		os.Exit(0)
-	}
 
 	if cli.GetCommandString() != "" {
-		fmt.Print("Printing tldr for", cli.GetCommandString())
 		printTldr(cli.GetCommandString())
 		os.Exit(0)
 	}
@@ -47,11 +46,27 @@ func main() {
 	cli.PrintHelp()
 }
 
-func clearLocalCache() {
-	panic("unimplemented")
+func printTldr(s string) error {
+	const cachePath = "./tldr/pages/common"
+
+	dir, err := os.ReadDir(cachePath)
+	if err != nil {
+		return err
+	}
+	for _, dirEntry := range dir {
+		var commandName = strings.TrimSuffix(dirEntry.Name(), ".md")
+		if commandName == s {
+			file, err := os.ReadFile(cachePath + "/" + dirEntry.Name())
+			if err != nil {
+				return err
+			}
+			print(string(file))
+		}
+	}
+	return nil
 }
 
-func printTldr(s string) {
+func clearLocalCache() {
 	panic("unimplemented")
 }
 
