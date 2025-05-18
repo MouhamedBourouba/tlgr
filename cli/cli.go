@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	platform      p.Platform
+	platform      p.PlatformType
 	commandString string = ""
 
 	parsed bool = false
@@ -49,7 +49,7 @@ func Parse() error {
 	platform = parsedPlatform
 
 	if flag.NArg() >= 1 {
-		commandString = strings.Join(flag.Args(), "-")
+		commandString = strings.ToLower(strings.Join(flag.Args(), "-"))
 	}
 
 	parsed = true
@@ -72,7 +72,7 @@ func GetCommandString() string {
 	return commandString
 }
 
-func GetPlatformString() p.Platform {
+func GetPlatformString() p.PlatformType {
 	assertParsed()
 	return platform
 }

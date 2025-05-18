@@ -7,19 +7,20 @@ import (
 	"strings"
 )
 
-type Platform int
+type PlatformType int
 
 const (
-	Linux Platform = iota
+	Linux PlatformType = iota
 	Macos
 	Windows
 	Android
 	Freebsd
 	Netbsd
 	openbsd
+	common
 )
 
-func GetDefaultPlatform() Platform {
+func GetDefaultPlatform() PlatformType {
 	switch runtime.GOOS {
 	case "android":
 		return Android
@@ -37,7 +38,7 @@ func GetDefaultPlatform() Platform {
 	panic("Error: unsupported paltform")
 }
 
-func (platform Platform) ToString() string {
+func (platform PlatformType) ToString() string {
 	switch platform {
 	case Android:
 		return "Android"
@@ -53,12 +54,14 @@ func (platform Platform) ToString() string {
 		return "Windows"
 	case openbsd:
 		return "openbsd"
+	case common:
+		return "common"
 	default:
 		panic(fmt.Sprintf("unexpected main.Platform: %#v", platform))
 	}
 }
 
-func ParsePlatform(platform string) (Platform, error) {
+func ParsePlatform(platform string) (PlatformType, error) {
 	switch strings.ToLower(platform) {
 	case "linux":
 		return Linux, nil
@@ -72,6 +75,8 @@ func ParsePlatform(platform string) (Platform, error) {
 		return Freebsd, nil
 	case "netbsd":
 		return Netbsd, nil
+	case "common":
+		return common, nil
 	default:
 		return -1, errors.New("Undefined platform")
 	}

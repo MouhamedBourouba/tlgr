@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/mouhamedbourouba/tlgr/cli"
+	"github.com/mouhamedbourouba/tlgr/config"
 )
 
 func main() {
@@ -46,23 +46,33 @@ func main() {
 	cli.PrintHelp()
 }
 
-func printTldr(s string) error {
-	const cachePath = "./tldr/pages/common"
+type Command struct {
+	name       string
+	pathToTldr string
+	platforms  []config.PlatformType
+}
 
-	dir, err := os.ReadDir(cachePath)
+type Commands []Command
+
+func IndexDir(dirPath string) error {
+	dir, err := os.ReadDir(dirPath)
+
 	if err != nil {
 		return err
 	}
+
 	for _, dirEntry := range dir {
-		var commandName = strings.TrimSuffix(dirEntry.Name(), ".md")
-		if commandName == s {
-			file, err := os.ReadFile(cachePath + "/" + dirEntry.Name())
-			if err != nil {
-				return err
-			}
-			print(string(file))
-		}
+		println(dirEntry.Name())
 	}
+
+	return nil
+}
+
+func printTldr(s string) error {
+	const cachePath = "./tldr/pages/"
+	
+	IndexDir(cachePath)
+
 	return nil
 }
 

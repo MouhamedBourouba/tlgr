@@ -11,7 +11,7 @@ type Tldr struct {
 
 var commands map[string]Tldr = make(map[string]Tldr)
 
-func IndexCache(path string, platform c.Platform) error {
+func IndexCache(path string, platform c.PlatformType) error {
 	entrs, err := os.ReadDir(path)
 	if err != nil {
 		return err
