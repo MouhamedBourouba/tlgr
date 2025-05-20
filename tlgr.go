@@ -46,14 +46,18 @@ func main() {
 	// fallthrou flags
 	if cli.GetClearCacheFlag() {
 		cacheInstance.Clear()
+		return
 	}
 
 	if cli.GetUpdateFlag() {
 		err := cacheInstance.Update()
+
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			return
 		}
+
+		return
 	}
 
 	if cli.GetCommandString() != "" {

@@ -129,10 +129,25 @@ func downloadTldrArchive(url string, dst string) error {
 	}
 	defer file.Close()
 
-	progress := progressbar.DefaultBytes(resp.ContentLength, "Downloading Repository")
-	if _, err := io.Copy(io.MultiWriter(progress, file), resp.Body); err != nil {
+	bar := progressbar.NewOptions(
+		int(resp.ContentLength),
+		progressbar.OptionEnableColorCodes(true),
+		progressbar.OptionShowBytes(true),
+		progressbar.OptionSetWidth(30),
+		progressbar.OptionSetDescription("Downloading TLDR repository"),
+		progressbar.OptionSetTheme(progressbar.Theme{
+			Saucer:        "[green]=[reset]",
+			SaucerHead:    "[green]>[reset]",
+			SaucerPadding: " ",
+			BarStart:      "[",
+			BarEnd:        "]",
+		}))
+
+	if _, err := io.Copy(io.MultiWriter(bar, file), resp.Body); err != nil {
 		return err
 	}
+
+	println()
 
 	return nil
 }
