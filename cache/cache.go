@@ -39,7 +39,7 @@ func isCacheExpired(modtime time.Time) bool {
 	return time.Now().After(expirationDate)
 }
 
-func LoadCache(cacheDir string, archiveUrl string) (Cache, error) {
+func LoadCache(cacheDir string, archiveUrl string) Cache {
 	cacheState := CacheStateEmpty
 	cacheTime := time.Now()
 
@@ -68,7 +68,7 @@ func LoadCache(cacheDir string, archiveUrl string) (Cache, error) {
 		sate:             cacheState,
 		currentCacheTime: cacheTime,
 		tldrRepoDir:      tldrRepoDir,
-	}, nil
+	}
 }
 
 func (cache Cache) GetState() CacheState {
@@ -79,7 +79,7 @@ func (cache Cache) GetCacheTime() time.Time {
 	return cache.currentCacheTime
 }
 
-func (cache Cache) Update() error {
+func (cache *Cache) Update() error {
 	archivePath := filepath.Join(cache.cacheDir, ARCHIVE_FILE_NAME)
 	outputDir := filepath.Join(cache.cacheDir, ARCHIVE_OUTPUT_DIR)
 
@@ -95,7 +95,7 @@ func (cache Cache) Update() error {
 		return err
 	}
 
-	os.Remove(archivePath)
+	_ = os.Remove(archivePath)
 	cache.sate = CacheStateFresh
 
 	return nil
@@ -103,7 +103,7 @@ func (cache Cache) Update() error {
 
 func (cache Cache) GetCommandListForPlatform(platform config.PlatformType) ([]string, error) {
 	if cache.sate == CacheStateEmpty {
-		return nil, errors.New("Error: Page cache not found, Please run `tlgr -update` to download the cache.")
+		return nil, errors.New("page cache not found")
 	}
 
 	commonPagesPath := filepath.Join(cache.tldrRepoDir, "pages/common")
@@ -112,22 +112,22 @@ func (cache Cache) GetCommandListForPlatform(platform config.PlatformType) ([]st
 	commonPages, err := os.ReadDir(commonPagesPath)
 	if err != nil {
 		print(err)
-		return nil, errors.New("Error: Invalid cache, Please run `tlgr -update` to download the cache.")
+		return nil, errors.New("invalid cache")
 	}
 	platformPages, err := os.ReadDir(platformPagesPth)
 	if err != nil {
-		return nil, errors.New("Error: Invalid cache, Please run `tlgr -update` to download the cache.")
+		return nil, errors.New("invalid cache")
 	}
 
 	allPages := slices.Concat(commonPages, platformPages)
-	allPagesNames := make([]string, 0, 0)
+	allPagesNames := make([]string, 0)
 
 	for _, entry := range allPages {
 		if !slices.Contains(allPagesNames, entry.Name()) {
 			allPagesNames = append(allPagesNames, entry.Name())
 		}
 	}
-	
+
 	return allPagesNames, nil
 }
 
@@ -152,8 +152,7 @@ func downloadTldrArchive(url string, dst string) error {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		fmt.Printf("resp.Status: %v\n", resp.Status)
-		return errors.New("Failed to download")
+		return fmt.Errorf("failed to download, status code %d", resp.StatusCode)
 	}
 
 	file, err := os.Create(dst)
@@ -180,7 +179,7 @@ func downloadTldrArchive(url string, dst string) error {
 		return err
 	}
 
-	println()
+	fmt.Print("\n")
 
 	return nil
 }

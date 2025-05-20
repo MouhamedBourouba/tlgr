@@ -1,7 +1,6 @@
 package config
 
 import (
-	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -80,7 +79,7 @@ func ParsePlatform(platform string) (PlatformType, error) {
 	case "common":
 		return common, nil
 	default:
-		return -1, errors.New("Undefined platform")
+		return -1, fmt.Errorf("undefined platform `%s`", platform)
 	}
 }
 
@@ -94,7 +93,7 @@ func GetAndCreateCacheDir() (string, error) {
 		return "", err
 	}
 	userCacheDir = filepath.Join(userCacheDir, "tlgr")
-	
+
 	err = os.MkdirAll(userCacheDir, os.ModePerm)
 	if err != nil {
 		return "", err

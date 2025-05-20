@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/mouhamedbourouba/tlgr/cache"
 	"github.com/mouhamedbourouba/tlgr/cli"
@@ -11,7 +10,10 @@ import (
 )
 
 func main() {
-	cli.Parse()
+	if err := cli.Parse(); err != nil {
+		fmt.Fprint(os.Stderr, "Failed to parse flags: ", err.Error())
+		os.Exit(1)
+	}
 
 	if cli.GetHelpFlag() {
 		cli.PrintHelp()
@@ -28,7 +30,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	cacheInstance, err := cache.LoadCache(appCacheDir, archiveUrl)
+
+	cacheInstance := cache.LoadCache(appCacheDir, archiveUrl)
 
 	// Todo: add auto update option
 	// if cacheInstance.GetState() == cache.CacheStateEmpty {
@@ -36,24 +39,27 @@ func main() {
 	// } else if cacheInstance.GetState() == cache.CacheStateOutdated {
 	// 	printOutdatedWarning(cacheInstance.GetCacheTime())
 	// }
+
 	if cli.GetListFlag() {
 		pages, err := cacheInstance.GetCommandListForPlatform(cli.GetPlatform())
 
 		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, "Error: ", err.Error(), ", please run tlgr -update to download the cache\n")
 			os.Exit(1)
 		}
 
 		for _, page := range pages {
 			fmt.Print(page, "\n")
 		}
-
 		return
 	}
 
 	// fallthrou flags
 	if cli.GetClearCacheFlag() {
-		cacheInstance.Clear()
+		if err = cacheInstance.Clear(); err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(1)
+		}
 		return
 	}
 
@@ -61,7 +67,7 @@ func main() {
 		err := cacheInstance.Update()
 
 		if err != nil {
-			fmt.Fprint(os.Stderr, err.Error())
+			fmt.Fprint(os.Stderr, "Error: ", err.Error())
 			return
 		}
 
@@ -69,25 +75,21 @@ func main() {
 	}
 
 	if cli.GetCommandString() != "" {
-		printTldr(cli.GetCommandString())
+		_ = printTldr(cli.GetCommandString())
 		return
 	}
 
 	cli.PrintHelp()
 }
 
-func printOutdatedWarning(currentTime time.Time) {
-	days := int(time.Since(currentTime).Hours() / 24)
-	yellow := "\033[33m"
-	reset := "\033[0m"
-	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
-}
+// func printOutdatedWarning(currentTime time.Time) {
+// 	days := int(time.Since(currentTime).Hours() / 24)
+// 	yellow := "\033[33m"
+// 	reset := "\033[0m"
+// 	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
+// }
 
 func printTldr(s string) error {
-	panic("unimplemented")
-}
-
-func listAllCommands() {
 	panic("unimplemented")
 }
 

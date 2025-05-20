@@ -1,17 +1,15 @@
 package cli
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"strings"
 
-	"github.com/mouhamedbourouba/tlgr/config"
 	p "github.com/mouhamedbourouba/tlgr/config"
 )
 
 var (
-	platform      p.PlatformType = config.GetDefaultPlatform()
+	platform      p.PlatformType = p.GetDefaultPlatform()
 	commandString string         = ""
 
 	parsed bool = false
@@ -45,7 +43,7 @@ func Parse() error {
 
 	parsedPlatform, err := p.ParsePlatform(*platformString)
 	if err != nil {
-		return errors.New("Undefined Platform")
+		return err
 	}
 	platform = parsedPlatform
 
