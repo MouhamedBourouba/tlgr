@@ -10,14 +10,6 @@ import (
 	"github.com/mouhamedbourouba/tlgr/config"
 )
 
-
-func printOutdatedWarning(currentTime time.Time) {
-	days := int(time.Since(currentTime).Hours() / 24)
-	yellow := "\033[33m"
-	reset := "\033[0m"
-	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
-}
-
 func main() {
 	cli.Parse()
 
@@ -31,18 +23,19 @@ func main() {
 		return
 	}
 
+	archiveUrl := config.GetArchiveUrlPath()
 	appCacheDir, err := config.GetAndCreateCacheDir()
 	if err != nil {
 		panic(err)
 	}
-	archiveUrl := config.GetArchiveUrlPath()
-
 	cacheInstance, err := cache.LoadCache(appCacheDir, archiveUrl)
-	if cacheInstance.GetState() == cache.CacheStateEmpty {
-		cacheInstance.Update()
-	} else if cacheInstance.GetState() == cache.CacheStateOutdated {
-		printOutdatedWarning(cacheInstance.GetCacheTime())
-	}
+
+	// Todo: add auto update option
+	// if cacheInstance.GetState() == cache.CacheStateEmpty {
+	// 	cacheInstance.Update()
+	// } else if cacheInstance.GetState() == cache.CacheStateOutdated {
+	// 	printOutdatedWarning(cacheInstance.GetCacheTime())
+	// }
 
 	if cli.GetListFlag() {
 		fmt.Printf("Listing ---\n")
@@ -52,12 +45,11 @@ func main() {
 
 	// fallthrou flags
 	if cli.GetClearCacheFlag() {
-		fmt.Printf("clearing cache ---\n")
-		clearLocalCache()
+		cacheInstance.Clear()
 	}
 
 	if cli.GetUpdateFlag() {
-		err := updateCache()
+		err := cacheInstance.Update()
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
 			return
@@ -71,44 +63,20 @@ func main() {
 
 	cli.PrintHelp()
 }
-type Command struct {
-	name       string
-	pathToTldr string
-	platforms  []config.PlatformType
-}
 
-type Commands []Command
-
-func IndexDir(dirPath string) error {
-	dir, err := os.ReadDir(dirPath)
-
-	if err != nil {
-		return err
-	}
-
-	for _, dirEntry := range dir {
-		println(dirEntry.Name())
-	}
-
-	return nil
+func printOutdatedWarning(currentTime time.Time) {
+	days := int(time.Since(currentTime).Hours() / 24)
+	yellow := "\033[33m"
+	reset := "\033[0m"
+	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
 }
 
 func printTldr(s string) error {
-	const cachePath = "./tldr/pages/"
-	IndexDir(cachePath)
-	return nil
-}
-
-func clearLocalCache() {
 	panic("unimplemented")
 }
 
 func listAllCommands() {
 	panic("unimplemented")
-}
-
-func updateCache() error {
-	return nil
 }
 
 func getVersion() string {

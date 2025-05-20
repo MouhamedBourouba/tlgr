@@ -41,10 +41,10 @@ func LoadCache(cacheDir string, archiveUrl string) (Cache, error) {
 	cacheState := CacheStateEmpty
 	cacheTime := time.Now()
 
-	tldrCacheDir := filepath.Join(cacheDir, ARCHIVE_OUTPUT_DIR)
-	indexJsonFilePath := filepath.Join(tldrCacheDir, "index.json")
+	tldrRepoDir := filepath.Join(cacheDir, ARCHIVE_OUTPUT_DIR)
+	indexJsonFilePath := filepath.Join(tldrRepoDir, "index.json")
 
-	_, err := os.Stat(tldrCacheDir)
+	_, err := os.Stat(tldrRepoDir)
 
 	if err == nil {
 		fileInfo, err := os.Stat(indexJsonFilePath)
@@ -93,11 +93,13 @@ func (cache Cache) Update() error {
 	}
 
 	os.Remove(archivePath)
+	cache.sate = CacheStateFresh
 
 	return nil
 }
 
-func (cache Cache) Clear() {
+func (cache Cache) Clear() error {
+	return os.RemoveAll(cache.cacheDir)
 }
 
 func (cache Cache) FindPage(p config.PlatformType) string {
