@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"time"
 
 	"github.com/mouhamedbourouba/tlgr/config"
@@ -30,6 +31,7 @@ type Cache struct {
 	currentCacheTime time.Time
 	archiveUrl       string
 	cacheDir         string
+	tldrRepoDir      string
 }
 
 func isCacheExpired(modtime time.Time) bool {
@@ -65,6 +67,7 @@ func LoadCache(cacheDir string, archiveUrl string) (Cache, error) {
 		cacheDir:         cacheDir,
 		sate:             cacheState,
 		currentCacheTime: cacheTime,
+		tldrRepoDir:      tldrRepoDir,
 	}, nil
 }
 
@@ -96,6 +99,36 @@ func (cache Cache) Update() error {
 	cache.sate = CacheStateFresh
 
 	return nil
+}
+
+func (cache Cache) GetCommandListForPlatform(platform config.PlatformType) ([]string, error) {
+	if cache.sate == CacheStateEmpty {
+		return nil, errors.New("Error: Page cache not found, Please run `tlgr -update` to download the cache.")
+	}
+
+	commonPagesPath := filepath.Join(cache.tldrRepoDir, "pages/common")
+	platformPagesPth := filepath.Join(cache.tldrRepoDir, "pages", platform.ToString())
+
+	commonPages, err := os.ReadDir(commonPagesPath)
+	if err != nil {
+		print(err)
+		return nil, errors.New("Error: Invalid cache, Please run `tlgr -update` to download the cache.")
+	}
+	platformPages, err := os.ReadDir(platformPagesPth)
+	if err != nil {
+		return nil, errors.New("Error: Invalid cache, Please run `tlgr -update` to download the cache.")
+	}
+
+	allPages := slices.Concat(commonPages, platformPages)
+	allPagesNames := make([]string, 0, 0)
+
+	for _, entry := range allPages {
+		if !slices.Contains(allPagesNames, entry.Name()) {
+			allPagesNames = append(allPagesNames, entry.Name())
+		}
+	}
+	
+	return allPagesNames, nil
 }
 
 func (cache Cache) Clear() error {

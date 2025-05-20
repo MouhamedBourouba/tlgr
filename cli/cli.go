@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/mouhamedbourouba/tlgr/config"
 	p "github.com/mouhamedbourouba/tlgr/config"
 )
 
 var (
-	platform      p.PlatformType
-	commandString string = ""
+	platform      p.PlatformType = config.GetDefaultPlatform()
+	commandString string         = ""
 
 	parsed bool = false
 
@@ -72,7 +73,7 @@ func GetCommandString() string {
 	return commandString
 }
 
-func GetPlatformString() p.PlatformType {
+func GetPlatform() p.PlatformType {
 	assertParsed()
 	return platform
 }

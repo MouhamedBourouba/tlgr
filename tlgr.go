@@ -36,10 +36,18 @@ func main() {
 	// } else if cacheInstance.GetState() == cache.CacheStateOutdated {
 	// 	printOutdatedWarning(cacheInstance.GetCacheTime())
 	// }
-
 	if cli.GetListFlag() {
-		fmt.Printf("Listing ---\n")
-		listAllCommands()
+		pages, err := cacheInstance.GetCommandListForPlatform(cli.GetPlatform())
+
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+
+		for _, page := range pages {
+			fmt.Print(page, "\n")
+		}
+
 		return
 	}
 

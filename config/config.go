@@ -43,17 +43,17 @@ func GetDefaultPlatform() PlatformType {
 func (platform PlatformType) ToString() string {
 	switch platform {
 	case Android:
-		return "Android"
+		return "android"
 	case Freebsd:
-		return "Freebsd"
+		return "freebsd"
 	case Linux:
-		return "Linux"
+		return "linux"
 	case Macos:
-		return "Macos"
+		return "macos"
 	case Netbsd:
-		return "Netbsd"
+		return "netbsd"
 	case Windows:
-		return "Windows"
+		return "windows"
 	case openbsd:
 		return "openbsd"
 	case common:
