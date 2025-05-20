@@ -3,6 +3,8 @@ package config
 import (
 	"errors"
 	"fmt"
+	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 )
@@ -80,4 +82,23 @@ func ParsePlatform(platform string) (PlatformType, error) {
 	default:
 		return -1, errors.New("Undefined platform")
 	}
+}
+
+func GetArchiveUrlPath() string {
+	return "https://github.com/tldr-pages/tldr/releases/latest/download/tldr.zip"
+}
+
+func GetAndCreateCacheDir() (string, error) {
+	userCacheDir, err := os.UserCacheDir()
+	if err != nil {
+		return "", err
+	}
+	userCacheDir = filepath.Join(userCacheDir, "tlgr")
+	
+	err = os.MkdirAll(userCacheDir, os.ModePerm)
+	if err != nil {
+		return "", err
+	}
+
+	return userCacheDir, nil
 }

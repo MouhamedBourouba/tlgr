@@ -1,61 +1,76 @@
 package main
 
 import (
-	"archive/zip"
-	"io"
-	"path/filepath"
-
-	"errors"
 	"fmt"
-	"net/http"
 	"os"
-	"strings"
+	"time"
 
+	"github.com/mouhamedbourouba/tlgr/cache"
 	"github.com/mouhamedbourouba/tlgr/cli"
 	"github.com/mouhamedbourouba/tlgr/config"
 )
+
+
+func printOutdatedWarning(currentTime time.Time) {
+	days := int(time.Since(currentTime).Hours() / 24)
+	yellow := "\033[33m"
+	reset := "\033[0m"
+	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
+}
 
 func main() {
 	cli.Parse()
 
 	if cli.GetHelpFlag() {
 		cli.PrintHelp()
-		os.Exit(0)
-	}
-
-	if cli.GetClearCacheFlag() {
-		fmt.Printf("clearing cache ---\n")
-		clearLocalCache()
+		return
 	}
 
 	if cli.GetVersionFlag() {
 		fmt.Printf("TLGR %s\n", getVersion())
-		os.Exit(0)
+		return
+	}
+
+	appCacheDir, err := config.GetAndCreateCacheDir()
+	if err != nil {
+		panic(err)
+	}
+	archiveUrl := config.GetArchiveUrlPath()
+
+	cacheInstance, err := cache.LoadCache(appCacheDir, archiveUrl)
+	if cacheInstance.GetState() == cache.CacheStateEmpty {
+		cacheInstance.Update()
+	} else if cacheInstance.GetState() == cache.CacheStateOutdated {
+		printOutdatedWarning(cacheInstance.GetCacheTime())
+	}
+
+	if cli.GetListFlag() {
+		fmt.Printf("Listing ---\n")
+		listAllCommands()
+		return
+	}
+
+	// fallthrou flags
+	if cli.GetClearCacheFlag() {
+		fmt.Printf("clearing cache ---\n")
+		clearLocalCache()
 	}
 
 	if cli.GetUpdateFlag() {
 		err := updateCache()
 		if err != nil {
 			fmt.Fprint(os.Stderr, err.Error())
-			os.Exit(1)
+			return
 		}
-		os.Exit(0)
-	}
-
-	if cli.GetListFlag() {
-		fmt.Printf("Listing ---\n")
-		listAllCommands()
-		os.Exit(0)
 	}
 
 	if cli.GetCommandString() != "" {
 		printTldr(cli.GetCommandString())
-		os.Exit(0)
+		return
 	}
 
 	cli.PrintHelp()
 }
-
 type Command struct {
 	name       string
 	pathToTldr string
@@ -93,68 +108,6 @@ func listAllCommands() {
 }
 
 func updateCache() error {
-	archiveUrl := "https://github.com/tldr-pages/tldr/releases/latest/download/tldr.zip"
-	dirPath := "tldr"
-	archivePath := "tldr.zip"
-
-	// resp, err := http.Get(archiveUrl)
-	// if err != nil {
-	// 	return err
-	// }
-	// defer resp.Body.Close()
-	//
-	// if resp.StatusCode != 200 {
-	// 	fmt.Printf("resp.Status: %v\n", resp.Status)
-	// 	return errors.New("Failed to download")
-	// }
-	//
-	// file, err := os.Create(archivePath)
-	// if err != nil {
-	// 	return err
-	// }
-	//
-	// var writeCounter = NewDownloadProgressCounter(uint64(resp.ContentLength))
-	// if _, err := io.Copy(io.MultiWriter(&writeCounter, file), resp.Body); err != nil {
-	// 	return err
-	// }
-	//
-	// zipReader, err := zip.OpenReader(archivePath)
-	// if err != nil {
-	// 	return err
-	// }
-	// defer zipReader.Close()
-	// println("Unzipping Archive in", dirPath, "...")
-	//
-	// for _, extractedFile := range zipReader.File {
-	// 	filepath := filepath.Join(dirPath, extractedFile.Name)
-	//
-	// 	if extractedFile.FileInfo().IsDir() {
-	// 		err := os.MkdirAll(filepath, os.ModePerm)
-	// 		if err != nil {
-	// 			return err
-	// 		}
-	// 		continue
-	// 	}
-	//
-	// 	extractedFileReader, err := extractedFile.Open()
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	defer extractedFileReader.Close()
-	//
-	// 	createdFile, err := os.Create(filepath)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	defer createdFile.Close()
-	//
-	// 	if _, err := io.Copy(createdFile, extractedFileReader); err != nil {
-	// 		return err
-	// 	}
-	// }
-	// 
-	// println("Done !!!")
-	// return nil
 	return nil
 }
 
