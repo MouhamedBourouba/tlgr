@@ -7,11 +7,12 @@ import (
 	"github.com/mouhamedbourouba/tlgr/cache"
 	"github.com/mouhamedbourouba/tlgr/cli"
 	"github.com/mouhamedbourouba/tlgr/config"
+	"github.com/mouhamedbourouba/tlgr/render"
 )
 
 func main() {
 	if err := cli.Parse(); err != nil {
-		fmt.Fprint(os.Stderr, "Failed to parse flags: ", err.Error())
+		fmt.Fprint(os.Stderr, "Failed to parse flags: ", err.Error(), "\n")
 		os.Exit(1)
 	}
 
@@ -68,13 +69,22 @@ func main() {
 
 		if err != nil {
 			fmt.Fprint(os.Stderr, "Error: ", err.Error())
-			return
+			os.Exit(1)
 		}
 		return
 	}
 
 	if cli.GetCommandString() != "" {
-		_ = printTldr(cli.GetCommandString())
+		page, err := cacheInstance.FindPage(cli.GetCommandString(), cli.GetPlatform())
+		if err != nil {
+			fmt.Fprint(os.Stderr, "Error: ", err.Error(), ", try tlgr -update", "\n")
+			os.Exit(1)
+		}
+
+		err = render.RenderPage(os.Stdout, page)
+		if err != nil {
+			return
+		}
 		return
 	}
 
@@ -87,10 +97,6 @@ func main() {
 // 	reset := "\033[0m"
 // 	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
 // }
-
-func printTldr(s string) error {
-	panic("unimplemented")
-}
 
 func getVersion() string {
 	return "0.0.1"

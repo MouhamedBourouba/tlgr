@@ -79,7 +79,7 @@ func ParsePlatform(platform string) (PlatformType, error) {
 	case "common":
 		return common, nil
 	default:
-		return -1, fmt.Errorf("undefined platform `%s`", platform)
+		return -1, fmt.Errorf("undefined platform `%s` [possible values: linux, macos, windows, android, freebsd, netbsd]", platform)
 	}
 }
 
