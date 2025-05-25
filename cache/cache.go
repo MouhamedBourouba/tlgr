@@ -26,8 +26,7 @@ const (
 	CacheStateOutdated
 )
 
-type Cache struct {
-	sate             CacheState
+type Cache struct { sate             CacheState
 	currentCacheTime time.Time
 	archiveUrl       string
 	cacheDir         string
@@ -135,13 +134,19 @@ func (cache Cache) Clear() error {
 	return os.RemoveAll(cache.cacheDir)
 }
 
-func (cache Cache) FindPage(p config.PlatformType) string {
-	pagePath := filepath.Join(cache.cacheDir, ARCHIVE_OUTPUT_DIR, p.ToString(), p.ToString()+"."+p.ToString()+".md")
-	if _, err := os.Stat(pagePath); err == nil {
-		return pagePath
+func (cache Cache) FindPage(page string, p config.PlatformType) (string, error) {
+	commonPath := filepath.Join(cache.tldrRepoDir, "pages", "common", (page + ".md"))
+	platformPath := filepath.Join(cache.tldrRepoDir, "pages", p.String(), (page + ".md"))
+
+	if _, err := os.Stat(platformPath); err == nil {
+		return platformPath, nil
 	}
 
-	return ""
+	if _, err := os.Stat(commonPath); err == nil {
+		return commonPath, nil
+	}
+
+	return "", fmt.Errorf("page `%s` not found in cache, try tlgr -update", page)
 }
 
 func downloadTldrArchive(url string, dst string) error {

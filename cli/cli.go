@@ -22,7 +22,7 @@ var (
 
 	platformString = flag.String(
 		"platform",
-		p.GetDefaultPlatform().ToString(),
+		p.GetDefaultPlatform().String(),
 		"Override the operating system [possible values: linux, macos, windows, android, freebsd, netbsd]",
 	)
 )

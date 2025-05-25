@@ -39,7 +39,7 @@ func GetDefaultPlatform() PlatformType {
 	panic("Error: unsupported paltform")
 }
 
-func (platform PlatformType) ToString() string {
+func (platform PlatformType) String() string {
 	switch platform {
 	case Android:
 		return "android"
