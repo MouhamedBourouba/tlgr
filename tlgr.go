@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/fatih/color"
 	"github.com/mouhamedbourouba/tlgr/cache"
 	"github.com/mouhamedbourouba/tlgr/cli"
 	"github.com/mouhamedbourouba/tlgr/config"
@@ -113,9 +114,7 @@ func RunApp() {
 
 func printOutdatedWarning(currentTime time.Time) {
 	days := int(time.Since(currentTime).Hours() / 24)
-	yellow := "\033[33m"
-	reset := "\033[0m"
-	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
+	color.Yellow("Warning: Cache is %d day(s) old!\n", days)
 }
 
 func getVersion() string {
