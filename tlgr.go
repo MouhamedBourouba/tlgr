@@ -70,7 +70,6 @@ func main() {
 			fmt.Fprint(os.Stderr, "Error: ", err.Error())
 			return
 		}
-
 		return
 	}
 
