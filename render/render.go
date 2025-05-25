@@ -20,7 +20,7 @@ func renderPageToString(filepath string) (string, error) {
 	stringBuilder := strings.Builder{}
 	scanner := bufio.NewScanner(file)
 
-	expression, err := regexp.Compile("{{.+}}")
+	expression, err := regexp.Compile("{{.+?}}")
 	if err != nil {
 		panic("Bad regular expression")
 	}
@@ -32,7 +32,7 @@ func renderPageToString(filepath string) (string, error) {
 
 		if strings.HasPrefix(scanner.Text(), "> ") {
 			res := strings.Replace(scanner.Text(), "> ", "", 1)
-			res = color.RedString(res)
+			res = color.HiRedString(res)
 			res = fmt.Sprintf("  %s\n", res)
 
 			stringBuilder.WriteString(res)
@@ -41,7 +41,7 @@ func renderPageToString(filepath string) (string, error) {
 
 		if strings.HasPrefix(scanner.Text(), "- ") {
 			res := strings.Replace(scanner.Text(), "- ", "", 1)
-			res = color.HiCyanString(res)
+			res = color.HiBlueString(res)
 			res = fmt.Sprintf("  %s\n", res)
 
 			stringBuilder.WriteString(res)
@@ -58,8 +58,10 @@ func renderPageToString(filepath string) (string, error) {
 					return underliner.Sprint(trimmed)
 				})
 			}
-			
-			res = color.HiMagentaString(res)
+
+			codeColor := color.New(color.FgHiMagenta, color.Bold)
+			res = codeColor.Sprint(res)
+
 			res = fmt.Sprintf("    %s\n", res)
 
 			stringBuilder.WriteString(res)
@@ -77,6 +79,9 @@ func renderPageToString(filepath string) (string, error) {
 
 func RenderPage(writer io.Writer, pageFilePath string) error {
 	page, err := renderPageToString(pageFilePath)
+	if err != nil {
+		return err
+	}
 
 	_, err = writer.Write([]byte(page))
 	if err != nil {
