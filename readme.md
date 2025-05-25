@@ -45,23 +45,6 @@ tlgr -platform macos docker
 tlgr -clear-cache
 ```
 
-## First Run
-
-On your first run, use the update command to populate your local cache:
-```bash
-tlgr -update
-```
-
-This will download the latest tldr pages and cache them locally for fast access.
-
-## Cache Management
-
-TLGR maintains a local cache of tldr pages for faster access. You can manage this cache using:
-
-- **Update cache**: `tlgr -update` - Downloads the latest pages
-- **Clear cache**: `tlgr -clear-cache` - Removes all cached pages
-- **List cached commands**: `tlgr -list` - Shows all available commands
-
 ## Platform Support
 
 TLGR supports multiple platforms. By default, it uses your current operating system, but you can override this:
