@@ -26,7 +26,8 @@ const (
 	CacheStateOutdated
 )
 
-type Cache struct { sate             CacheState
+type Cache struct {
+	sate             CacheState
 	currentCacheTime time.Time
 	archiveUrl       string
 	cacheDir         string
@@ -87,8 +88,6 @@ func (cache *Cache) Update() error {
 		return err
 	}
 
-	println("Unzipping Archive in", outputDir, "...")
-
 	err = unzipArchive(archivePath, outputDir)
 	if err != nil {
 		return err
@@ -102,20 +101,20 @@ func (cache *Cache) Update() error {
 
 func (cache Cache) GetCommandListForPlatform(platform config.PlatformType) ([]string, error) {
 	if cache.sate == CacheStateEmpty {
-		return nil, errors.New("page cache not found")
+		return nil, errors.New("page cache not found, try tlgr -update")
 	}
 
 	commonPagesPath := filepath.Join(cache.tldrRepoDir, "pages/common")
-	platformPagesPth := filepath.Join(cache.tldrRepoDir, "pages", platform.ToString())
+	platformPagesPth := filepath.Join(cache.tldrRepoDir, "pages", platform.String())
 
 	commonPages, err := os.ReadDir(commonPagesPath)
 	if err != nil {
 		print(err)
-		return nil, errors.New("invalid cache")
+		return nil, errors.New("invalid cache, try tlgr -update")
 	}
 	platformPages, err := os.ReadDir(platformPagesPth)
 	if err != nil {
-		return nil, errors.New("invalid cache")
+		return nil, errors.New("invalid cache, try tlgr -update")
 	}
 
 	allPages := slices.Concat(commonPages, platformPages)
@@ -196,6 +195,19 @@ func unzipArchive(archivePath string, outputPath string) error {
 	}
 	defer zipReader.Close()
 
+	bar := progressbar.NewOptions(
+		len(zipReader.File) - 300,
+		progressbar.OptionEnableColorCodes(true),
+		progressbar.OptionSetWidth(30),
+		progressbar.OptionSetDescription("Unzipping the TLDR archive "),
+		progressbar.OptionSetTheme(progressbar.Theme{
+			Saucer:        "[green]=[reset]",
+			SaucerHead:    "[green]>[reset]",
+			SaucerPadding: " ",
+			BarStart:      "[",
+			BarEnd:        "]",
+		}))
+
 	for _, extractedFile := range zipReader.File {
 		filepath := filepath.Join(outputPath, extractedFile.Name)
 
@@ -222,7 +234,11 @@ func unzipArchive(archivePath string, outputPath string) error {
 		if _, err := io.Copy(createdFile, extractedFileReader); err != nil {
 			return err
 		}
+
+		_ = bar.Add(1)
 	}
+
+	fmt.Println()
 
 	return nil
 }
