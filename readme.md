@@ -15,14 +15,6 @@ TLGR is a lightweight, fast alternative to the traditional `man` pages, providin
 - 📋 **List Commands**: Browse all available commands in your cache
 - 🧹 **Cache Management**: Clear cache when needed
 
-### Usage
-Get examples for a specific command:
-```bash
-tlgr git commit
-tlgr awk
-tlgr tar
-```
-
 ### Options
 
 | Option | Description |
