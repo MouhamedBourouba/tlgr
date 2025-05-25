@@ -5,13 +5,16 @@ import (
 	"os"
 )
 
-func RenderPage(writer io.Writer, pageFilePath string) (error) {
+func RenderPage(writer io.Writer, pageFilePath string) error {
 	data, err := os.ReadFile(pageFilePath)
 	if err != nil {
 		return err
 	}
 
-	writer.Write(data)
+	_, err = writer.Write(data)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

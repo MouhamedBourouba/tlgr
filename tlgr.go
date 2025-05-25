@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/mouhamedbourouba/tlgr/cache"
 	"github.com/mouhamedbourouba/tlgr/cli"
@@ -27,6 +28,7 @@ func main() {
 	}
 
 	archiveUrl := config.GetArchiveUrlPath()
+
 	appCacheDir, err := config.GetAndCreateCacheDir()
 	if err != nil {
 		panic(err)
@@ -34,12 +36,15 @@ func main() {
 
 	cacheInstance := cache.LoadCache(appCacheDir, archiveUrl)
 
-	// Todo: add auto update option
-	// if cacheInstance.GetState() == cache.CacheStateEmpty {
-	// 	cacheInstance.Update()
-	// } else if cacheInstance.GetState() == cache.CacheStateOutdated {
-	// 	printOutdatedWarning(cacheInstance.GetCacheTime())
-	// }
+	if cacheInstance.GetState() == cache.CacheStateEmpty {
+		err = cacheInstance.Update()
+		if err != nil {
+			fmt.Fprint(os.Stderr, err.Error())
+			os.Exit(1)
+		}
+	} else if cacheInstance.GetState() == cache.CacheStateOutdated {
+		printOutdatedWarning(cacheInstance.GetCacheTime())
+	}
 
 	if cli.GetListFlag() {
 		pages, err := cacheInstance.GetCommandListForPlatform(cli.GetPlatform())
@@ -91,12 +96,12 @@ func main() {
 	cli.PrintHelp()
 }
 
-// func printOutdatedWarning(currentTime time.Time) {
-// 	days := int(time.Since(currentTime).Hours() / 24)
-// 	yellow := "\033[33m"
-// 	reset := "\033[0m"
-// 	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
-// }
+func printOutdatedWarning(currentTime time.Time) {
+	days := int(time.Since(currentTime).Hours() / 24)
+	yellow := "\033[33m"
+	reset := "\033[0m"
+	fmt.Printf("%sWarning: Cache is %d day(s) old!%s\n", yellow, days, reset)
+}
 
 func getVersion() string {
 	return "0.0.1"
