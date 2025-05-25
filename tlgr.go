@@ -12,6 +12,21 @@ import (
 )
 
 func main() {
+	// f, err := os.Create("cpu.prof")
+	// if err != nil {
+	// 	log.Fatal("could not create CPU profile: ", err)
+	// }
+	// defer f.Close()
+	//
+	// if err := pprof.StartCPUProfile(f); err != nil {
+	// 	log.Fatal("could not start CPU profile: ", err)
+	// }
+	// defer pprof.StopCPUProfile()
+	//
+	RunApp()
+}
+
+func RunApp() {
 	if err := cli.Parse(); err != nil {
 		fmt.Fprint(os.Stderr, "Failed to parse flags: ", err.Error(), "\n")
 		os.Exit(1)
