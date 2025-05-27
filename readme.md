@@ -13,7 +13,7 @@ Why not
 
 ## Flags
 
-| Option | Description |
+| Flag | Description |
 |--------|-------------|
 | `-version` | Print the version |
 | `-update` | Update the local cache with latest pages |
