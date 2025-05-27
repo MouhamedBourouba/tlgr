@@ -3,10 +3,10 @@
 A fast tldr client written in Go, becasue why not
 
 ## Features
-- 🚀 **Fast**: Written in Go for optimal performance
-- 💾 **Local Caching**: Cache pages locally for offline access
-- 🔄 **Auto-updates**: Keep your command database up to date
-- 🖥️ **Cross-platform**: Any go supported platform really
+- **Fast**: Written in Go for optimal performance
+- **Local Caching**: Cache pages locally for offline access
+- **Auto-updates**: Keep your command database up to date
+- **Cross-platform**: Any go supported platform really
 
 ## Flags
 
