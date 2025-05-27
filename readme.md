@@ -1,9 +1,6 @@
 # TLGR
 
-A fast tldr client written in Go that provides quick access to simplified command examples and explanations.
-
-## Why
-Why not
+A fast tldr client written in Go, becasue why not
 
 ## Features
 - 🚀 **Fast**: Written in Go for optimal performance
